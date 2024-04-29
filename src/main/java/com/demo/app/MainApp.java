@@ -9,6 +9,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.StringJoiner;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 /**
@@ -19,8 +21,8 @@ import java.util.stream.Collectors;
  */
 public class MainApp {
 
-	ResourceBundle i18n = ResourceBundle.getBundle("i18n.messages", Locale.ROOT);
-	Properties config = new Properties();
+	private static ResourceBundle i18n = ResourceBundle.getBundle("i18n.messages", Locale.ROOT);
+	private Properties config = new Properties();
 
 	private String name = "";
 	private boolean exit = false;
@@ -51,13 +53,18 @@ public class MainApp {
 	 *             Interface.
 	 */
 	public void initialize(String[] args) {
-		log(MainApp.class, "INFO", "Initializing %s ...", name);
-		Map<String, String> maps = Arrays.asList(args).stream().map(e -> e.split("="))
-				.collect(Collectors.toMap(e -> e[0], e -> e[1]));
-		extractConfigAttributes(maps);
+		log(MainApp.class, "INFO", "Initializing %s [%s]...",
+				getMessage("app.title"),
+				name);
 		for (String arg : args) {
 			debug(MainApp.class, "arg:%s", arg);
 		}
+
+		Map<String, String> maps = Arrays.asList(args).stream().map(e -> e.split("="))
+				.collect(Collectors.toMap(e -> e[0], e -> e[1]));
+		// parse argume,nts to extract configuration keys/values
+		extractConfigAttributes(maps);
+		// load configuration values from file
 		loadConfigurationFrom(configFilePath);
 		// overload loaded values with CLI arguments ones
 		extractConfigAttributes(maps);
@@ -145,7 +152,7 @@ public class MainApp {
 	 *             Interface.
 	 */
 	public static void main(String[] args) {
-		MainApp app = new MainApp("testapp");
+		MainApp app = new MainApp("MainApp");
 		app.run(args);
 	}
 
@@ -190,5 +197,53 @@ public class MainApp {
 
 	public static synchronized void setDebugLevel(int dl) {
 		debugLevel = dl;
+	}
+
+	/**
+	 * Retrieve a specific message from the translation according to its message
+	 * key.
+	 *
+	 * @param keyMsg the key of the message in the translation files
+	 * @return the corresponding translated message.
+	 */
+	public static String getMessage(String keyMsg) {
+		return replaceTemplate(i18n.getString(keyMsg), i18n);
+	}
+
+	/**
+	 * Process template text to replace "${specific.key}" by their translated
+	 * values.
+	 *
+	 * @param template the template text to be parsed and where keys must be
+	 *                 translated.
+	 * @param values   the list of translated keys/values.
+	 * @return the key translated resulting message.
+	 */
+	public static String replaceTemplate(String template, ResourceBundle values) {
+		StringTokenizer tokenizer = new StringTokenizer(template, "${}", true);
+		StringJoiner joiner = new StringJoiner("");
+
+		while (tokenizer.hasMoreTokens()) {
+			String token = tokenizer.nextToken();
+
+			if (token.equals("$")) {
+				if (tokenizer.hasMoreTokens()) {
+					token = tokenizer.nextToken();
+
+					if (token.equals("{") && tokenizer.hasMoreTokens()) {
+						String key = tokenizer.nextToken();
+
+						if (tokenizer.hasMoreTokens() && tokenizer.nextToken().equals("}")) {
+							String value = values.containsKey(key) ? values.getString(key) : "${" + key + "}";
+							joiner.add(value);
+						}
+					}
+				}
+			} else {
+				joiner.add(token);
+			}
+		}
+
+		return joiner.toString();
 	}
 }
