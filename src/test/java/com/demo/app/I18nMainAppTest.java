@@ -6,17 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class I18nMainAppTest {
-    MainApp app;
 
-    @BeforeEach
-    void setUp() {
-        app = new MainApp("testapp");
-    }
-
-    @AfterEach
-    void tearDown() {
-        app = null;
-    }
 
     @Test
     void getMessage() {

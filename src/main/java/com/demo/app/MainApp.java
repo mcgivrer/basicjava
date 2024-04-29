@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
  */
 public class MainApp {
 
-    private static ResourceBundle i18n = ResourceBundle.getBundle("i18n.messages", Locale.ROOT);
-    private Properties config = new Properties();
+    private static final ResourceBundle i18n = ResourceBundle.getBundle("i18n.messages", Locale.ROOT);
+    private final Properties config = new Properties();
 
-    private String name = "";
+    private String name;
     private boolean exit = false;
     private boolean testMode = false;
     private String configFilePath = "/config.properties";
@@ -60,9 +60,9 @@ public class MainApp {
             debug(MainApp.class, "arg:%s", arg);
         }
 
-        Map<String, String> maps = Arrays.asList(args).stream().map(e -> e.split("="))
+        Map<String, String> maps = Arrays.stream(args).map(e -> e.split("="))
             .collect(Collectors.toMap(e -> e[0], e -> e[1]));
-        // parse argume,nts to extract configuration keys/values
+        // parse arguments to extract configuration keys/values
         extractConfigAttributes(maps);
         // load configuration values from file
         loadConfigurationFrom(configFilePath);
@@ -117,9 +117,7 @@ public class MainApp {
                     testMode = Boolean.parseBoolean(v);
                     info(MainApp.class, "configuration : start with test mode %s", testMode);
                 }
-                default -> {
-                    warn(MainApp.class, "Unknown configuration argument %s=%s", k, v);
-                }
+                default -> warn(MainApp.class, "Unknown configuration argument %s=%s", k, v);
             }
         });
 
@@ -130,8 +128,9 @@ public class MainApp {
      */
     protected void process() {
         info(MainApp.class, "Processing...");
+        int i = 0;
         do {
-            // Todo Code what is needed.
+            debug(MainApp.class, "Processing %s!", ++i);
         } while (!(exit || testMode));
         info(MainApp.class, "Process done.");
     }

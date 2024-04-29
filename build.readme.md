@@ -67,7 +67,7 @@ Available command line options include:
 
 ### Properties File Documentation
 
-here is a Sample properties file:
+Here is a Sample properties file:
 
 ```properties
 project.name=sjdp
@@ -81,8 +81,7 @@ project.author.email=frederic.delorme@gmail.com
 project.build.jdk.version=20
 ```
 
-
-where :
+Where :
 
 #### `project.name`
 
@@ -92,7 +91,7 @@ where :
 #### `project.title`
 
 - **Value**: `SJDP`
-- **Description**: The title or full name of the project, which can be used for display purposes.
+- **Description**: The title or full name of the project, which can be used for display.
 
 #### `project.version`
 
@@ -107,7 +106,7 @@ where :
 #### `project.javadoc.classpath`
 
 - **Value**: `com.snapgames`
-- **Description**: Specifies the base classpath for generating JavaDoc documentation.
+- **Description**: Specify the base classpath for generating JavaDoc documentation.
 
 #### `project.javadoc.packages`
 
@@ -137,8 +136,5 @@ user or developer documentation for better clarity.
 
 ---
 
-
-
-
 _**Note:** The above documentation provides a high-level overview of the script's functionality. Some details
-might need to be expanded upon depending on the audience's familiarity with the script and the build process._
+might need to be expanded upon depending on the audience's familiarity with the script and the build process.
