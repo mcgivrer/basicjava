@@ -101,14 +101,14 @@ fi
 # Paths
 export SRC=src
 export LIBS=lib
-export LIB_TEST=$LIBS/scenes/junit-platform-console-standalone-1.10.1.jar
+export LIB_TEST=$LIBS/test/junit-platform-console-standalone-1.10.1.jar
 export LIB_CHECKSTYLES=$LIBS/tools/checkstyle-10.12.3-all.jar
 export TARGET=target
 export BUILD=$TARGET/build
 export CLASSES=$TARGET/classes
-export TEST_CLASSES=$TARGET/scenes-classes
+export TEST_CLASSES=$TARGET/test-classes
 export RESOURCES=$SRC/main/resources
-export TEST_RESOURCES=$SRC/scenes/resources
+export TEST_RESOURCES=$SRC/test/resources
 export JAR_NAME=$PROGRAM_NAME-$PROGRAM_VERSION.jar
 export JAR_JAVADOC_NAME=$PROGRAM_NAME-$PROGRAM_VERSION-javadoc.jar
 export CHECK_RULES_FILE=$LIBS/tools/rules/${CHECK_RULES}_checks.xml
@@ -221,19 +221,19 @@ function executeTests() {
   step "Execute tests..."
   echo "> from : $SRC/test"
   echo "> to   : $TARGET/test-classes"
-  mkdir -p $TARGET/scenes-classes
+  mkdir -p $TARGET/test-classes
   echo "copy test resources"
   cp -r ./$RESOURCES/* $TEST_CLASSES
   cp -r ./$TEST_RESOURCES/* $TEST_CLASSES
   echo "compile test classes"
-  #list scenes sources
+  #list test sources
   find $SRC/main -name '*.java' >$TARGET/sources.lst
-  find $SRC/scenes -name '*.java' >$TARGET/scenes-sources.lst
+  find $SRC/test -name '*.java' >$TARGET/test-sources.lst
   javac -source $SOURCE_VERSION \
   -encoding $SOURCE_ENCODING $COMPILATION_OPTS \
   -cp ".${FS}$LIB_TEST${FS}${EXTERNAL_JARS}" \
   -d $TEST_CLASSES @$TARGET/sources.lst \
-  @$TARGET/scenes-sources.lst
+  @$TARGET/test-sources.lst
   echo "execute tests through JUnit"
   java $JAR_OPTS -jar $LIB_TEST \
   --cp "${EXTERNAL_JARS}${FS}${CLASSES}${FS}${TEST_CLASSES}${FS}." \
@@ -385,7 +385,7 @@ function run() {
   j | J | jar)
     createJar
     ;;
-  t | T | scenes)
+  t | T | test)
     clearTarget
     manifest
     compile
