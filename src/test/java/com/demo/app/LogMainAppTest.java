@@ -67,7 +67,7 @@ class LogMainAppTest {
         String outputCompareString = output.substring(output.indexOf("|"));
         Assertions.assertEquals("| com.demo.app.LogMainAppTest | ERROR | test-error-true", outputCompareString, "System out is not updated");
         String error = errorStreamCaptor.toString().trim();
-        String errorCompareString = output.substring(output.indexOf("|"));
+        String errorCompareString = error.substring(output.indexOf("|"));
         Assertions.assertEquals("| com.demo.app.LogMainAppTest | ERROR | test-error-true", errorCompareString, "System error is not updated");
     }
 
@@ -79,7 +79,7 @@ class LogMainAppTest {
         Assertions.assertEquals("| com.demo.app.LogMainAppTest | FATAL | test-fatal-128.00", outputCompareString, "System out is not updated");
 
         String error = errorStreamCaptor.toString().trim();
-        String errorCompareString = output.substring(output.indexOf("|"));
+        String errorCompareString = error.substring(output.indexOf("|"));
         Assertions.assertEquals("| com.demo.app.LogMainAppTest | FATAL | test-fatal-128.00", errorCompareString, "System error is not updated");
     }
 }

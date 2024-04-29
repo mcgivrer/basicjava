@@ -21,21 +21,25 @@ import java.util.stream.Collectors;
  */
 public class MainApp {
 
-    private static ResourceBundle i18n = ResourceBundle.getBundle("i18n.messages", Locale.ROOT);
-    private Properties config = new Properties();
+    private static final ResourceBundle i18n = ResourceBundle.getBundle("i18n.messages", Locale.ROOT);
+    private final Properties config = new Properties();
 
-    private String name = "";
+    private String name;
     private boolean exit = false;
     private boolean testMode = false;
     private String configFilePath = "/config.properties";
     private static int debugLevel = 0;
+    private int maxIteration;
+    private int iterationCounter;
+    private boolean showConsole;
+    private static AppConsole console = new AppConsole();
 
     public MainApp(String name) {
         this.name = name;
     }
 
     /**
-     * Main processing entry point tfor this program.
+     * Main processing entry point for this program.
      *
      * @param args the array of arguments coming from the Java Command Line
      *             Interface.
@@ -47,7 +51,7 @@ public class MainApp {
     }
 
     /**
-     * Initialize the program with CLI arguemnts, and read the Configuration file.
+     * Initialize the program with CLI arguments, and read the Configuration file.
      *
      * @param args the array of arguments coming from the Java Command Line
      *             Interface.
@@ -60,9 +64,9 @@ public class MainApp {
             debug(MainApp.class, "arg:%s", arg);
         }
 
-        Map<String, String> maps = Arrays.asList(args).stream().map(e -> e.split("="))
+        Map<String, String> maps = Arrays.stream(args).map(e -> e.split("="))
             .collect(Collectors.toMap(e -> e[0], e -> e[1]));
-        // parse argume,nts to extract configuration keys/values
+        // parse arguments to extract configuration keys/values
         extractConfigAttributes(maps);
         // load configuration values from file
         loadConfigurationFrom(configFilePath);
@@ -117,9 +121,13 @@ public class MainApp {
                     testMode = Boolean.parseBoolean(v);
                     info(MainApp.class, "configuration : start with test mode %s", testMode);
                 }
-                default -> {
-                    warn(MainApp.class, "Unknown configuration argument %s=%s", k, v);
+                case "i", "maxIteration", "app.max.iteration" -> {
+                    maxIteration = Integer.parseInt(v);
                 }
+                case "con", "console", "app.console" -> {
+                    showConsole = Boolean.parseBoolean(v);
+                }
+                default -> warn(MainApp.class, "Unknown configuration argument %s=%s", k, v);
             }
         });
 
@@ -129,10 +137,15 @@ public class MainApp {
      * Main processing of the program.
      */
     protected void process() {
+        if (showConsole) {
+            console.setVisible(true);
+        }
         info(MainApp.class, "Processing...");
+        int i = 0;
         do {
-            // Todo Code what is needed.
-        } while (!(exit || testMode));
+            info(MainApp.class, "Processing %s !", ++i);
+        } while (!(exit || testMode) && (maxIteration != 0 && i < maxIteration));
+        iterationCounter = i;
         info(MainApp.class, "Process done.");
     }
 
@@ -190,6 +203,11 @@ public class MainApp {
         }
         System.out.printf("%s | %s | %s | %s%n",
             DateTimeFormatter.ISO_ZONED_DATE_TIME.format(ldt),
+            className.getCanonicalName(),
+            level,
+            String.format(message, args));
+        MainApp.console.printf("%s | %s | %s | %s",
+            DateTimeFormatter.ISO_DATE_TIME.format(ldt),
             className.getCanonicalName(),
             level,
             String.format(message, args));
@@ -257,5 +275,9 @@ public class MainApp {
 
     public String getName() {
         return name;
+    }
+
+    public int getIterationCounter() {
+        return iterationCounter;
     }
 }
