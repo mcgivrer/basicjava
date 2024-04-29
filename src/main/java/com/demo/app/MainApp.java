@@ -31,13 +31,15 @@ public class MainApp {
     private static int debugLevel = 0;
     private int maxIteration;
     private int iterationCounter;
+    private boolean showConsole;
+    private static AppConsole console = new AppConsole();
 
     public MainApp(String name) {
         this.name = name;
     }
 
     /**
-     * Main processing entry point tfor this program.
+     * Main processing entry point for this program.
      *
      * @param args the array of arguments coming from the Java Command Line
      *             Interface.
@@ -49,7 +51,7 @@ public class MainApp {
     }
 
     /**
-     * Initialize the program with CLI arguemnts, and read the Configuration file.
+     * Initialize the program with CLI arguments, and read the Configuration file.
      *
      * @param args the array of arguments coming from the Java Command Line
      *             Interface.
@@ -122,6 +124,9 @@ public class MainApp {
                 case "i", "maxIteration", "app.max.iteration" -> {
                     maxIteration = Integer.parseInt(v);
                 }
+                case "con", "console", "app.console" -> {
+                    showConsole = Boolean.parseBoolean(v);
+                }
                 default -> warn(MainApp.class, "Unknown configuration argument %s=%s", k, v);
             }
         });
@@ -132,6 +137,9 @@ public class MainApp {
      * Main processing of the program.
      */
     protected void process() {
+        if (showConsole) {
+            console.setVisible(true);
+        }
         info(MainApp.class, "Processing...");
         int i = 0;
         do {
@@ -195,6 +203,11 @@ public class MainApp {
         }
         System.out.printf("%s | %s | %s | %s%n",
             DateTimeFormatter.ISO_ZONED_DATE_TIME.format(ldt),
+            className.getCanonicalName(),
+            level,
+            String.format(message, args));
+        MainApp.console.printf("%s | %s | %s | %s",
+            DateTimeFormatter.ISO_DATE_TIME.format(ldt),
             className.getCanonicalName(),
             level,
             String.format(message, args));
