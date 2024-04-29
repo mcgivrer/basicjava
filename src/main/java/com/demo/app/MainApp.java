@@ -29,6 +29,8 @@ public class MainApp {
     private boolean testMode = false;
     private String configFilePath = "/config.properties";
     private static int debugLevel = 0;
+    private int maxIteration;
+    private int iterationCounter;
 
     public MainApp(String name) {
         this.name = name;
@@ -117,6 +119,9 @@ public class MainApp {
                     testMode = Boolean.parseBoolean(v);
                     info(MainApp.class, "configuration : start with test mode %s", testMode);
                 }
+                case "i", "maxIteration", "app.max.iteration" -> {
+                    maxIteration = Integer.parseInt(v);
+                }
                 default -> warn(MainApp.class, "Unknown configuration argument %s=%s", k, v);
             }
         });
@@ -130,8 +135,9 @@ public class MainApp {
         info(MainApp.class, "Processing...");
         int i = 0;
         do {
-            debug(MainApp.class, "Processing %s!", ++i);
-        } while (!(exit || testMode));
+            info(MainApp.class, "Processing %s !", ++i);
+        } while (!(exit || testMode) && (maxIteration != 0 && i < maxIteration));
+        iterationCounter = i;
         info(MainApp.class, "Process done.");
     }
 
@@ -256,5 +262,9 @@ public class MainApp {
 
     public String getName() {
         return name;
+    }
+
+    public int getIterationCounter() {
+        return iterationCounter;
     }
 }
